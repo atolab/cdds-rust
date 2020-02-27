@@ -1,11 +1,6 @@
-[package]
-name = "cdds-rust"
-version = "0.1.0"
-authors = ["kydos <angelo@icorsaro.net>"]
-edition = "2018"
+[workspace]
 
-[dependencies]
-libc = "0.2.67"
-
-[build-dependencies]
-bindgen = "0.51.1"
+members = [
+  "dds",
+  "example"
+]
