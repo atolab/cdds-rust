@@ -9,6 +9,8 @@ fn main() {
     let bindings = bindgen::Builder::default()
         .header("wrapper.h")
         .clang_arg("-I/usr/local/include")
+        .clang_arg("-I/opt/ros/eloquent/include")
+        .clang_arg("-I/usr/lib/gcc/x86_64-linux-gnu/8/include")
         .generate()
         .expect("Unable to generate bindings");
 
