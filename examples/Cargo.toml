@@ -1,13 +1,12 @@
 [package]
-name = "example"
+name = "examples"
 version = "0.1.0"
 authors = ["kydos <angelo@icorsaro.net>"]
 publish = false
 edition = "2018"
 
 [dev-dependencies]
-dds = { path = "../dds" }
-
+ddsc = { path = ".." }
 
 [[example]]
 name = "pub"

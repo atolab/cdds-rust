@@ -1,6 +1,18 @@
-[workspace]
+[package]
+name = "ddsc"
+version = "0.1.0"
+authors = ["kydos <angelo@icorsaro.net>"]
+license = "Apache-2.0"
+readme = "README.md"
+keywords = ["DDS", "CycloneDDS"]
+repository = "https://github.com/atolabs/cdds-rust"
+documentation = "https://docs.rs/ddsc"
+description = """
+Bindings to libddsc (CycloneDDS).
+"""
+categories = ["api-bindings"]
+edition = "2018"
 
-members = [
-  "dds",
-  "example"
-]
+[dependencies]
+libc = "0.2.67"
+libddsc-sys = { path = "libddsc-sys", version = "0.1.0" }
