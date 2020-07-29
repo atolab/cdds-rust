@@ -13,6 +13,9 @@ Bindings to libddsc (CycloneDDS).
 categories = ["api-bindings"]
 edition = "2018"
 
+[lib]
+name = "dds"
+
 [dependencies]
 libc = "0.2.67"
 libddsc-sys = { path = "libddsc-sys", version = "0.1.0" }
