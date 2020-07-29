@@ -1,11 +1,17 @@
 [package]
-name = "dds"
+name = "libddsc-sys"
 version = "0.1.0"
 authors = ["kydos <angelo@icorsaro.net>"]
+license = "Apache-2.0"
+links = "ddsc"
 edition = "2018"
 
 [dependencies]
 libc = "0.2.67"
+
+[lib]
+name = "libddsc_sys"
+path = "lib.rs"
 
 [build-dependencies]
 bindgen = "0.53.1"
