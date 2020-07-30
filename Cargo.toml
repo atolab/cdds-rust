@@ -8,7 +8,7 @@ keywords = ["DDS", "CycloneDDS"]
 repository = "https://github.com/atolabs/cdds-rust"
 documentation = "https://docs.rs/ddsc"
 description = """
-Bindings to libddsc (CycloneDDS).
+High-level API for the native CycloneDDS bindings (libddsc-sys).
 """
 categories = ["api-bindings"]
 edition = "2018"

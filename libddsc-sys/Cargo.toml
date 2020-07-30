@@ -5,6 +5,9 @@ authors = ["kydos <angelo@icorsaro.net>"]
 license = "Apache-2.0"
 links = "ddsc"
 edition = "2018"
+description = """
+Native bindings to libddsc (CycloneDDS).
+"""
 
 [dependencies]
 libc = "0.2.67"
