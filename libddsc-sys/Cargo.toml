@@ -8,13 +8,15 @@ edition = "2018"
 description = """
 Native bindings to libddsc (CycloneDDS).
 """
+build="build.rs"
 
 [dependencies]
 libc = "0.2.67"
 
 [lib]
 name = "libddsc_sys"
-path = "lib.rs"
+path = "src/lib.rs"
 
 [build-dependencies]
 bindgen = "0.55.1"
+cmake = "0.1.44"

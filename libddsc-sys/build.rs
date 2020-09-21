@@ -1,14 +1,22 @@
 extern crate bindgen;
+extern crate cmake;
 
+use cmake::Config;
 use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    println!("cargo:rustc-link-lib=ddsc");
-    println!("cargo:rustc-link-lib=cdds-util");
+    let dst = Config::new("src/cyclonedds")
+        .define("BUILD_IDLC", "OFF")
+        .define("BUILD_SHARED_LIBS", "OFF")
+        .build();
+
+    println!("cargo:rustc-link-search=native={}/lib", dst.display());
+    println!("cargo:rustc-link-lib=static=ddsc");
+
     let bindings = bindgen::Builder::default()
         .header("wrapper.h")
-        .clang_arg("-I/usr/local/include")
+        .clang_arg(format!("-I{}/include", dst.display()))
         .generate_comments(false)
         .generate()
         .expect("Unable to generate bindings");
