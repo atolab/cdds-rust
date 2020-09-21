@@ -28,6 +28,8 @@ jobs:
       run: sudo apt-get update && sudo apt-get -y install ros-eloquent-cyclonedds
 
     - uses: actions/checkout@v2
+      with:
+        submodules: true
 
     - name: Run cargo check
       uses: actions-rs/cargo@v1
