@@ -27,6 +27,9 @@ jobs:
     - name: Update ROS 2 APT sources
       run: sudo apt-get update && sudo apt-get -y install ros-eloquent-cyclonedds
 
+    - name: Install OpenSSL development library
+      run: sudo apt-get update && sudo apt-get -y install libssl-dev
+
     - uses: actions/checkout@v2
       with:
         submodules: true
