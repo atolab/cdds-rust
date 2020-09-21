@@ -9,6 +9,7 @@ fn main() {
     let dst = Config::new("src/cyclonedds")
         .define("BUILD_IDLC", "OFF")
         .define("BUILD_SHARED_LIBS", "OFF")
+        .define("ENABLE_SSL", "OFF") // Disable SSL for now
         .build();
 
     println!("cargo:rustc-link-search=native={}/lib", dst.display());
