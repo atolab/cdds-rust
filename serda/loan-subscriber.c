@@ -386,29 +386,30 @@ char *create_unique_topic_name (const char *prefix, char *name, size_t size)
 
 int main(int argc, char *argv[])
 {
-  if (argc < 2) {
-    printf("USAGE:\n\tsub <topic-name>\n");
-    exit(1);  
+  char* partition = NULL;
+
+  if (argc < 3) {
+    printf("USAGE:\n\tsub <topic-name> <type_name> [<partition>]\n");
+    exit(1);
   }
+  if (argc > 3) {
+    partition = argv[3];
+  }
+
   dds_return_t rc;
-  char topicname[100];
 
   const dds_entity_t pp = dds_create_participant (DDS_DOMAIN_DEFAULT, NULL, NULL);
+  printf("Topic: %s\n", argv[1]);
 
-  create_unique_topic_name ("ddsc_cdr_basic", topicname, sizeof topicname);
-  printf("Topic: %s\n", topicname);
-
-  struct ddsi_sertopic *st = make_sertopic (topicname, argv[1]);
+  struct ddsi_sertopic *st = make_sertopic (argv[1], argv[2]);
   const dds_entity_t tp = dds_create_topic_generic (pp, &st, NULL, NULL, NULL);
 
-  const dds_entity_t rd = dds_create_reader (pp, tp, NULL, NULL);
-
-  // regular write (from_sample(DATA) + to_topicless)
-  struct sampletype xs[] = {
-    { .key = "aap", .value = "banaan" },
-    { .key = "kolibrie", .value = "nectar" }
-  };
-
+  dds_qos_t *qos = NULL;
+  if (partition != NULL) {
+    qos = dds_qos_create();
+    dds_qset_partition1(qos, partition);
+  }
+  const dds_entity_t rd = dds_create_reader (pp, tp, qos, NULL);
 
   do
   {
@@ -420,16 +421,16 @@ int main(int argc, char *argv[])
     rc = dds_take (rd, samples, &si, MAX_SAMPLES, MAX_SAMPLES);
     for (int i = 0; i < rc; ++i) {
       if (NULL != samples[i]->key) {
-        printf("1 Reading message KEY: %s\n", samples[i]->key);
+        printf("Reading message KEY: %s\n", samples[i]->key);
       }
       if (NULL != samples[i]->value) {
-        printf("1 Reading message VALUE: %s\n", samples[i]->value);
+        printf("Reading message VALUE: %s\n", samples[i]->value);
       }
 
       dds_free (samples[i]->key);
       dds_free (samples[i]->value);
     }
-    // dds_return_loan(rd, samples, MAX_SAMPLES);
+    dds_return_loan(rd, samples, MAX_SAMPLES);
     printf("Reading message\n");
     dds_sleepfor (DDS_MSECS (1000));
   } while(true);

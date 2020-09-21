@@ -9,19 +9,23 @@ const MAX_SAMPLES: usize = 32;
 #[derive(Debug)]
 pub enum MatchedEntity {
     DiscoveredPublication {
-        name: String,
+        topic_name: String,
+        type_name: String,
         partition: Option<String>,
     },
     UndiscoveredPublication {
-        name: String,
+        topic_name: String,
+        type_name: String,
         partition: Option<String>,
     },
     DiscoveredSubscription {
-        name: String,
+        topic_name: String,
+        type_name: String,
         partition: Option<String>,
     },
     UndiscoveredSubscription {
-        name: String,
+        topic_name: String,
+        type_name: String,
         partition: Option<String>,
     },
 }
@@ -46,6 +50,7 @@ unsafe extern "C" fn on_data(dr: dds_entity_t, arg: *mut std::os::raw::c_void) {
         if si[i as usize].valid_data {
             let sample = samples[i as usize] as *mut dds_builtintopic_endpoint_t;
             let topic_name = CStr::from_ptr((*sample).topic_name).to_str().unwrap();
+            let type_name = CStr::from_ptr((*sample).type_name).to_str().unwrap();
             let mut n = 0u32;
             let mut ps: *mut *mut ::std::os::raw::c_char = std::ptr::null_mut();
             let _ = dds_qget_partition(
@@ -60,14 +65,16 @@ unsafe extern "C" fn on_data(dr: dds_entity_t, arg: *mut std::os::raw::c_void) {
                         if btx.0 {
                             (btx.1)
                                 .send(MatchedEntity::DiscoveredPublication {
-                                    name: String::from(topic_name),
+                                    topic_name: String::from(topic_name),
+                                    type_name: String::from(type_name),
                                     partition: Some(String::from(p)),
                                 })
                                 .unwrap();
                         } else {
                             (btx.1)
                                 .send(MatchedEntity::DiscoveredSubscription {
-                                    name: String::from(topic_name),
+                                    topic_name: String::from(topic_name),
+                                    type_name: String::from(type_name),
                                     partition: Some(String::from(p)),
                                 })
                                 .unwrap();
@@ -75,14 +82,16 @@ unsafe extern "C" fn on_data(dr: dds_entity_t, arg: *mut std::os::raw::c_void) {
                     } else if btx.0 {
                         (btx.1)
                             .send(MatchedEntity::UndiscoveredPublication {
-                                name: String::from(topic_name),
+                                topic_name: String::from(topic_name),
+                                type_name: String::from(type_name),
                                 partition: Some(String::from(p)),
                             })
                             .unwrap();
                     } else {
                         (btx.1)
                             .send(MatchedEntity::UndiscoveredSubscription {
-                                name: String::from(topic_name),
+                                topic_name: String::from(topic_name),
+                                type_name: String::from(type_name),
                                 partition: Some(String::from(p)),
                             })
                             .unwrap();
@@ -92,14 +101,16 @@ unsafe extern "C" fn on_data(dr: dds_entity_t, arg: *mut std::os::raw::c_void) {
                 if btx.0 {
                     (btx.1)
                         .send(MatchedEntity::DiscoveredPublication {
-                            name: String::from(topic_name),
+                            topic_name: String::from(topic_name),
+                            type_name: String::from(type_name),
                             partition: None,
                         })
                         .unwrap();
                 } else {
                     (btx.1)
                         .send(MatchedEntity::DiscoveredSubscription {
-                            name: String::from(topic_name),
+                            topic_name: String::from(topic_name),
+                            type_name: String::from(type_name),
                             partition: None,
                         })
                         .unwrap();
@@ -107,14 +118,16 @@ unsafe extern "C" fn on_data(dr: dds_entity_t, arg: *mut std::os::raw::c_void) {
             } else if btx.0 {
                 (btx.1)
                     .send(MatchedEntity::UndiscoveredPublication {
-                        name: String::from(topic_name),
+                        topic_name: String::from(topic_name),
+                        type_name: String::from(type_name),
                         partition: None,
                     })
                     .unwrap();
             } else {
                 (btx.1)
                     .send(MatchedEntity::UndiscoveredSubscription {
-                        name: String::from(topic_name),
+                        topic_name: String::from(topic_name),
+                        type_name: String::from(type_name),
                         partition: None,
                     })
                     .unwrap();

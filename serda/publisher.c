@@ -385,23 +385,30 @@ char *create_unique_topic_name (const char *prefix, char *name, size_t size)
 
 int main(int argc, char *argv[])
 {
-  if (argc < 2) {
-    printf("USAGE:\n\tpub <topic-name>\n");
-    exit(1);  
+   char* partition = NULL;
+
+  if (argc < 3) {
+    printf("USAGE:\n\tpub <topic-name> <type_name> [<partition>]\n");
+    exit(1);
+  }
+  if (argc > 3) {
+    partition = argv[3];
   }
 
   dds_return_t rc;
-  char topicname[100];
 
   const dds_entity_t pp = dds_create_participant (DDS_DOMAIN_DEFAULT, NULL, NULL);
+  printf("Topic: %s\n", argv[1]);
 
-  create_unique_topic_name ("ddsc_cdr_basic", topicname, sizeof topicname);
-  printf("Topic: %s\n", topicname);
-
-  struct ddsi_sertopic *st = make_sertopic (topicname, argv[1]);
+  struct ddsi_sertopic *st = make_sertopic (argv[1], argv[1]);
   const dds_entity_t tp = dds_create_topic_generic (pp, &st, NULL, NULL, NULL);
 
-  const dds_entity_t wr = dds_create_writer (pp, tp, NULL, NULL);
+  dds_qos_t *qos = NULL;
+  if (partition != NULL) {
+    qos = dds_qos_create();
+    dds_qset_partition1(qos, partition);
+  }
+  const dds_entity_t wr = dds_create_writer (pp, tp, qos, NULL);
 
   // regular write (from_sample(DATA) + to_topicless)
   struct sampletype xs[] = {
