@@ -4,7 +4,7 @@ CycloneDDS bindings for Rust
 
 ```toml
 [dependencies]
-ddsc = "0.1.1"
+ddsc = "0.1.2"
 ```
 
 ## Rust version requirements

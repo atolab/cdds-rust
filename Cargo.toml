@@ -1,6 +1,6 @@
 [package]
 name = "ddsc"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["kydos <angelo@icorsaro.net>"]
 license = "Apache-2.0"
 readme = "README.md"
@@ -18,4 +18,4 @@ name = "dds"
 
 [dependencies]
 libc = "0.2.67"
-libddsc-sys = { path = "libddsc-sys", version = "0.1.0" }
+libddsc-sys = { path = "libddsc-sys", version = "0.1.2" }
