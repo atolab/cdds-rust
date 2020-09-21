@@ -48,12 +48,12 @@ unsafe extern "C" fn on_data(dr: dds_entity_t, arg: *mut std::os::raw::c_void) {
             let topic_name = CStr::from_ptr((*sample).topic_name).to_str().unwrap();
             let mut n = 0u32;
             let mut ps: *mut *mut ::std::os::raw::c_char = std::ptr::null_mut();
-            let has_partition = dds_qget_partition(
+            let _ = dds_qget_partition(
                 (*sample).qos,
                 &mut n as *mut u32,
                 &mut ps as *mut *mut *mut ::std::os::raw::c_char,
             );
-            if has_partition {
+            if n > 0 {
                 for k in 0..n {
                     let p = CStr::from_ptr(*(ps.offset(k as isize))).to_str().unwrap();
                     if si[i as usize].instance_state == dds_instance_state_DDS_IST_ALIVE {
