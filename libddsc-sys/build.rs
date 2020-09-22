@@ -7,7 +7,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
 
-fn build_static_cyclonedds(bindgen_builder: &bindgen::Builder) {
+fn build_static_cyclonedds() -> String {
     if !Path::new("src/cyclonedds/.git").exists() {
         let _ = Command::new("git")
             .args(&["submodule", "update", "--init", "src/cyclonedds"])
@@ -22,7 +22,7 @@ fn build_static_cyclonedds(bindgen_builder: &bindgen::Builder) {
 
     println!("cargo:rustc-link-search=native={}/lib", dst.display());
     println!("cargo:rustc-link-lib=static=ddsc");
-    dst.display()
+    format!("-I{}/include", dst.display())
 }
 
 fn main() {
@@ -30,25 +30,19 @@ fn main() {
         .header("wrapper.h")
         .generate_comments(false);
 
-    let include_paths = if cfg!(feature = "static_cyclonedds") {
-        let output_cyclonedds_dir = build_static_cyclonedds(&bindgen_builder);
-        vec![format!("-I{}/include", output_cyclonedds_dir)]
+    let bindings = if cfg!(feature = "static") {
+        bindgen_builder.clang_arg(build_static_cyclonedds())
     } else {
         println!("cargo:rustc-link-lib=ddsc");
         println!("cargo:rustc-link-search=/opt/ros/foxy/lib/x86_64-linux-gnu");
         println!("cargo:rustc-link-search=/opt/ros/eloquent/lib");
         println!("cargo:rustc-link-search=/opt/ros/dashing/lib");
-        vec![
-            String::from("/usr/local/include"),
-            String::from("/opt/ros/foxy/include"),
-            String::from("/opt/ros/eloquent/include"),
-            String::from("/opt/ros/dashing/include"),
-            String::from("/usr/lib/gcc/x86_64-linux-gnu/8/include"),
-        ]
-    };
-
-    let bindings = for &include_path in include_paths {
-        bindgen_builder.clang_arg(include_path);
+        bindgen_builder
+            .clang_arg("-I/usr/local/include")
+            .clang_arg("-I/opt/ros/foxy/include")
+            .clang_arg("-I/opt/ros/eloquent/include")
+            .clang_arg("-I/opt/ros/dashing/include")
+            .clang_arg("-I/usr/lib/gcc/x86_64-linux-gnu/8/include")
     }
     .generate()
     .expect("Unable to generate bindings");
