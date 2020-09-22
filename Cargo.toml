@@ -22,5 +22,4 @@ libddsc-sys = { path = "libddsc-sys", version = "0.1.2" }
 
 [features]
 default = []
-# Enable this feature if you want to have a statically linked CycloneDDS
-static_cyclonedds = []
+static = ["libddsc-sys/static"]
