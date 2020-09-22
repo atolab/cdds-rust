@@ -26,9 +26,6 @@ jobs:
     - name: Update ROS 2 APT sources
       run: sudo apt-get update && sudo apt-get -y install ros-eloquent-cyclonedds
 
-    - name: Install OpenSSL development library
-      run: sudo apt-get update && sudo apt-get -y install libssl-dev openssl
-
     - uses: actions/checkout@v2
 
     - name: Run cargo check
@@ -61,13 +58,12 @@ jobs:
         args: -- --check
 
   build_static:
-    runs-on: ${{matrix.os}}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ubuntu_latest
 
     steps:
+    - name: Install LLVM
+      run: sudo apt-get update && sudo apt-get -y install llvm
+
     - uses: actions/checkout@v2
 
     - name: Run cargo check
