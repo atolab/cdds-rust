@@ -58,7 +58,7 @@ jobs:
         args: -- --check
 
   build_static:
-    runs-on: ubuntu_latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Install LLVM
