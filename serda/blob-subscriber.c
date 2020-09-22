@@ -128,13 +128,12 @@ static struct ddsi_serdata *z_serdata_from_ser_iov (const struct ddsi_sertopic *
 {
   printf("==> <z_serdata_from_ser_iov> for %s -- size %zu\n", tpcmn->name, size);
   struct z_ddsi_payload *zp = (struct z_ddsi_payload *)malloc(sizeof(struct z_ddsi_payload));
-  ddsi_serdata_init(&zp->sd, tpcmn, kind);
+  ddsi_serdata_init(&zp->sd, tpcmn, kind);  
   zp->size = size;
   zp->kind = kind;
   zp->payload = 0;
   switch (kind) {
-    case SDK_EMPTY:
-      break;
+    case SDK_KEY:
     case SDK_DATA:
       zp->payload = malloc(size);
       int offset = 0;
@@ -146,7 +145,7 @@ static struct ddsi_serdata *z_serdata_from_ser_iov (const struct ddsi_sertopic *
         offset += iov[i].iov_len;
       }
       break;
-    case SDK_KEY:
+    case SDK_EMPTY:
       break;
   }
   return (struct ddsi_serdata *)zp;
@@ -168,7 +167,6 @@ static struct ddsi_serdata *z_serdata_to_topicless (const struct ddsi_serdata *s
   return ddsi_serdata_ref(sd);
 }
 
-
 static const struct ddsi_serdata_ops z_serdata_ops = {
   .get_size = z_serdata_size,
   .eqkey = z_serdata_eqkey,
@@ -177,6 +175,17 @@ static const struct ddsi_serdata_ops z_serdata_ops = {
   .to_topicless = z_serdata_to_topicless
 };
 
+
+dds_entity_t z_create_blob_topic(dds_entity_t dp, char *topic_name, char* type_name, bool is_keyless) {
+  struct ddsi_sertopic *st = (struct ddsi_sertopic*) malloc(sizeof(struct ddsi_sertopic));
+  ddsi_sertopic_init (st, topic_name, type_name, &z_sertopic_ops, &z_serdata_ops, is_keyless);
+  return dds_create_topic_generic (dp, &st, NULL, NULL, NULL);
+}
+
+int z_take_blob(dds_entity_t rd, struct z_ddsi_payload** sample, dds_sample_info_t * si) {
+  struct ddsi_serdata **sd = (struct ddsi_serdata **)sample;
+  return dds_takecdr(rd, sd, 1, si, DDS_ANY_STATE);
+}
 
 int main(int argc, char *argv[])
 {
@@ -192,33 +201,25 @@ int main(int argc, char *argv[])
 
   dds_return_t rc;
 
-  const dds_entity_t pp = dds_create_participant (DDS_DOMAIN_DEFAULT, NULL, NULL);
-  printf("Topic Name: %s\n", argv[1]);
-
-  struct ddsi_sertopic *st = (struct ddsi_sertopic*) malloc(sizeof(struct ddsi_sertopic));
-  printf("Initialising SerTopic\n");
-  ddsi_sertopic_init (st, argv[1], argv[2], &z_sertopic_ops, &z_serdata_ops, true);
-
-  printf("Creating Topic\n");
-  const dds_entity_t tp = dds_create_topic_generic (pp, &st, NULL, NULL, NULL);
+  const dds_entity_t dp = dds_create_participant (DDS_DOMAIN_DEFAULT, NULL, NULL);
+  const dds_entity_t tp = z_create_blob_topic(dp, argv[1], argv[2], true);
 
   dds_qos_t *qos = NULL;
   if (partition != NULL) {
-  printf("Creating Qos\n");
+
     qos = dds_create_qos();
     dds_qset_partition1(qos, partition);
   }
-  printf("Creating Reader\n");
-  const dds_entity_t rd = dds_create_reader (pp, tp, qos, NULL);
+
+  const dds_entity_t rd = dds_create_reader (dp, tp, qos, NULL);
 
   do
   {
-    struct ddsi_serdata *sample;
+    struct z_ddsi_payload *zp = NULL;
     dds_sample_info_t si;
-    rc = dds_takecdr(rd, &sample, 1, &si, DDS_ANY_STATE);
+    rc = z_take_blob(rd, &zp, &si);
     printf("Received %d samples\n", rc);
     if (rc > 0) {
-      struct z_ddsi_payload *zp = (struct z_ddsi_payload *)sample;
       printf("Payload:\n Size = %d\n", (int)zp->size);
       for (int i = 0; i < zp->size; ++i) {
         printf("%d ", (int)zp->payload[i]);
@@ -228,5 +229,5 @@ int main(int argc, char *argv[])
     dds_sleepfor (DDS_MSECS (1000));
   } while(true);
 
-  rc = dds_delete (pp);
+  rc = dds_delete (dp);
 }
