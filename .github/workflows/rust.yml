@@ -30,7 +30,7 @@ jobs:
         command: fmt
         args: -- --check
 
-  build_ros2:
+  build:
     needs: setup
     runs-on: ubuntu-latest
 
