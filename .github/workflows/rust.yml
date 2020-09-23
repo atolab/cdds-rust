@@ -43,7 +43,7 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: test
-        args: --verbose
+        args: --verbose --all-targets
 
     - name: Clippy
       uses: actions-rs/cargo@v1
@@ -82,7 +82,7 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: test
-        args: --verbose
+        args: --verbose --all-targets --features "static libddsc-sys/static"
 
     - name: Clippy
       uses: actions-rs/cargo@v1
