@@ -1,20 +1,26 @@
 [package]
 name = "libddsc-sys"
 version = "0.1.2"
-authors = ["kydos <angelo@icorsaro.net>"]
+authors = ["kydos <angelo@icorsaro.net>", "Esteve Fernandez <esteve@apache.org>"]
 license = "Apache-2.0"
 links = "ddsc-util"
 edition = "2018"
 description = """
 Native bindings to libddsc (CycloneDDS).
 """
+build="build.rs"
 
 [dependencies]
 libc = "0.2.67"
 
 [lib]
 name = "libddsc_sys"
-path = "lib.rs"
+path = "src/lib.rs"
 
 [build-dependencies]
 bindgen = "0.55.1"
+cmake = "0.1.44"
+
+[features]
+default = []
+static = []

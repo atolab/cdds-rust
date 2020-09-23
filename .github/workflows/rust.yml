@@ -10,8 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  build_ros2:
     runs-on: ubuntu-latest
 
     steps:
@@ -40,17 +39,56 @@ jobs:
         command: build
         args: --verbose --all-targets
 
+    - name: Run tests
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --verbose --all-targets
+
     - name: Clippy
       uses: actions-rs/cargo@v1
       with:
         command: clippy
         args: --all --examples
 
+    - name: Run rustfmt
+      uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: -- --check
+
+  build_static:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install LLVM
+      run: sudo apt-get update && sudo apt-get -y install llvm
+
+    - uses: actions/checkout@v2
+
+    - name: Run cargo check
+      uses: actions-rs/cargo@v1
+      with:
+        command: check
+        args: --verbose --all-targets --features "static libddsc-sys/static"
+
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --verbose --all-targets --features "static libddsc-sys/static"
+
     - name: Run tests
       uses: actions-rs/cargo@v1
       with:
         command: test
-        args: --verbose
+        args: --verbose --all-targets --features "static libddsc-sys/static"
+
+    - name: Clippy
+      uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: --all --examples
 
     - name: Run rustfmt
       uses: actions-rs/cargo@v1

@@ -1,7 +1,7 @@
 [package]
 name = "ddsc"
 version = "0.1.2"
-authors = ["kydos <angelo@icorsaro.net>"]
+authors = ["kydos <angelo@icorsaro.net>", "Esteve Fernandez <esteve@apache.org>"]
 license = "Apache-2.0"
 readme = "README.md"
 keywords = ["DDS", "CycloneDDS"]
@@ -19,3 +19,7 @@ name = "dds"
 [dependencies]
 libc = "0.2.67"
 libddsc-sys = { path = "libddsc-sys", version = "0.1.2" }
+
+[features]
+default = []
+static = ["libddsc-sys/static"]

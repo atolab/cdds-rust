@@ -1,0 +1,4 @@
+[submodule "libddsc-sys/src/cyclonedds"]
+	path = libddsc-sys/src/cyclonedds
+	url = https://github.com/eclipse-cyclonedds/cyclonedds.git
+	shallow = true
