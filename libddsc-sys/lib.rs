@@ -1,7 +1,6 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
-#[allow(improper_ctypes)]
 
 
 pub const DDS_MIN_PSEUDO_HANDLE : dds_entity_t = 0x7fff0000 as dds_entity_t;

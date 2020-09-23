@@ -3,7 +3,7 @@ name = "libddsc-sys"
 version = "0.1.2"
 authors = ["kydos <angelo@icorsaro.net>"]
 license = "Apache-2.0"
-links = "cdds-util"
+links = "ddsc"
 edition = "2018"
 description = """
 Native bindings to libddsc (CycloneDDS).
@@ -17,10 +17,4 @@ name = "libddsc_sys"
 path = "lib.rs"
 
 [build-dependencies]
-bindgen = "0.55.1"
-
-[target.x86_64-apple-darwin]
-rustflags = [
-  "-L", "/usr/local/lib",
-  "-l", "ddsc",
-]
+bindgen = "0.53.1"

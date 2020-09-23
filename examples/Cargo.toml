@@ -4,19 +4,10 @@ version = "0.1.2"
 authors = ["kydos <angelo@icorsaro.net>"]
 publish = false
 edition = "2018"
-[dependencies]
-cdds-util = {path = ".."}
+
+[dev-dependencies]
+ddsc = { path = ".." }
 
 [[example]]
 name = "pub"
 path = "pub.rs"
-
-[[example]]
-name = "discoverer"
-path = "discoverer.rs"
-
-[target.x86_64-apple-darwin]
-rustflags = [
-  "-L", "/usr/local/lib",
-  "-l", "ddsc",
-]
