@@ -58,11 +58,22 @@ jobs:
         args: -- --check
 
   build_static:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
 
     steps:
     - name: Install LLVM
       run: sudo apt-get update && sudo apt-get -y install llvm
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+
+    - name: Install latest toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
 
     - uses: actions/checkout@v2
 

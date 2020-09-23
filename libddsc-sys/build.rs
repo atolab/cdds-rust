@@ -23,8 +23,10 @@ fn build_static_cyclonedds() -> String {
     println!("cargo:rustc-link-lib=static=ddsc");
 
     // Link against OpenSSL libraries
-    println!("cargo:rustc-link-lib=ssl");
-    println!("cargo:rustc-link-lib=crypto");
+    if cfg!(target_os = "linux") {
+        println!("cargo:rustc-link-lib=crypto");
+        println!("cargo:rustc-link-lib=ssl");
+    }
 
     format!("-I{}/include", dst.display())
 }
