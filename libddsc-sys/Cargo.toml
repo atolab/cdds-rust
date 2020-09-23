@@ -1,7 +1,7 @@
 [package]
 name = "libddsc-sys"
 version = "0.1.2"
-authors = ["kydos <angelo@icorsaro.net>"]
+authors = ["kydos <angelo@icorsaro.net>", "Esteve Fernandez <esteve@apache.org>"]
 license = "Apache-2.0"
 links = "ddsc-util"
 edition = "2018"
