@@ -1,8 +1,8 @@
 use std::mem::MaybeUninit;
-// use std::{thread, time};
 use libddsc_sys::*;
-use std::ffi::CStr;
+use std::ffi::{CStr, CString};
 use std::sync::mpsc::{channel, Receiver, Sender};
+use std::sync::Arc;
 
 const MAX_SAMPLES: usize = 32;
 
@@ -12,6 +12,7 @@ pub enum MatchedEntity {
         topic_name: String,
         type_name: String,
         partition: Option<String>,
+        qos: Arc<*mut dds_qos_t>
     },
     UndiscoveredPublication {
         topic_name: String,
@@ -22,6 +23,7 @@ pub enum MatchedEntity {
         topic_name: String,
         type_name: String,
         partition: Option<String>,
+        qos: Arc<*mut dds_qos_t>
     },
     UndiscoveredSubscription {
         topic_name: String,
@@ -53,6 +55,10 @@ unsafe extern "C" fn on_data(dr: dds_entity_t, arg: *mut std::os::raw::c_void) {
             let type_name = CStr::from_ptr((*sample).type_name).to_str().unwrap();
             let mut n = 0u32;
             let mut ps: *mut *mut ::std::os::raw::c_char = std::ptr::null_mut();
+            let qos = dds_create_qos();
+            dds_copy_qos(qos, (*sample).qos);
+            let bqos = Arc::new(qos);
+
             let _ = dds_qget_partition(
                 (*sample).qos,
                 &mut n as *mut u32,
@@ -68,6 +74,7 @@ unsafe extern "C" fn on_data(dr: dds_entity_t, arg: *mut std::os::raw::c_void) {
                                     topic_name: String::from(topic_name),
                                     type_name: String::from(type_name),
                                     partition: Some(String::from(p)),
+                                    qos: bqos.clone()
                                 })
                                 .unwrap();
                         } else {
@@ -76,6 +83,7 @@ unsafe extern "C" fn on_data(dr: dds_entity_t, arg: *mut std::os::raw::c_void) {
                                     topic_name: String::from(topic_name),
                                     type_name: String::from(type_name),
                                     partition: Some(String::from(p)),
+                                    qos: bqos.clone()
                                 })
                                 .unwrap();
                         }
@@ -104,6 +112,7 @@ unsafe extern "C" fn on_data(dr: dds_entity_t, arg: *mut std::os::raw::c_void) {
                             topic_name: String::from(topic_name),
                             type_name: String::from(type_name),
                             partition: None,
+                            qos: bqos.clone()
                         })
                         .unwrap();
                 } else {
@@ -112,6 +121,7 @@ unsafe extern "C" fn on_data(dr: dds_entity_t, arg: *mut std::os::raw::c_void) {
                             topic_name: String::from(topic_name),
                             type_name: String::from(type_name),
                             partition: None,
+                            qos: bqos.clone()
                         })
                         .unwrap();
                 }
@@ -147,6 +157,7 @@ fn main() {
         let ptx = Box::new((true, tx.clone()));
         let stx = Box::new((false, tx));
         let dp = dds_create_participant(DDS_DOMAIN_DEFAULT, std::ptr::null(), std::ptr::null());
+        let _ = cdds_create_blob_sertopic(dp, CString::new("Foo").unwrap().into_raw(), CString::new("Bar").unwrap().into_raw(), true);
         let pub_listener = dds_create_listener(Box::into_raw(ptx) as *mut std::os::raw::c_void);
         dds_lset_data_available(pub_listener, Some(on_data));
 

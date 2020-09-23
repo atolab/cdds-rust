@@ -21,12 +21,6 @@ pub struct QoS {
 }
 
 impl QoS {
-    pub fn new() -> QoS {
-        QoS {
-            qos: unsafe { libddsc_sys::dds_create_qos() },
-        }
-    }
-
     pub fn reset(&mut self) {
         unsafe { libddsc_sys::dds_qos_reset(self.qos) }
     }
@@ -55,7 +49,7 @@ impl QoS {
         // let p = CString::new(ps[0]).unwrap().as_ptr();
         let mut cps: Vec<*const c_char> = ps
             .iter()
-            .map(|s| CString::new(String::from(s)).unwrap().as_ptr())
+            .map(|s| CString::new(String::from(s)).unwrap().into_raw() as *const c_char)
             .collect();
         unsafe {
             libddsc_sys::dds_qset_partition(
@@ -63,6 +57,14 @@ impl QoS {
                 ps.len() as u32,
                 cps.as_mut_ptr() as *mut *const ::std::os::raw::c_char,
             )
+        }
+    }
+}
+
+impl Default for QoS {
+    fn default() -> QoS {
+        QoS {
+            qos: unsafe { libddsc_sys::dds_create_qos() },
         }
     }
 }

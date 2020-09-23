@@ -5,6 +5,7 @@ use std::path::PathBuf;
 
 fn main() {
     println!("cargo:rustc-link-lib=ddsc");
+    println!("cargo:rustc-link-lib=cdds-util");
     println!("cargo:rustc-link-search=/opt/ros/foxy/lib/x86_64-linux-gnu");
     println!("cargo:rustc-link-search=/opt/ros/eloquent/lib");
     println!("cargo:rustc-link-search=/opt/ros/dashing/lib");

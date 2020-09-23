@@ -9,5 +9,5 @@ edition = "2018"
 ddsc = { path = ".." }
 
 [[example]]
-name = "pub"
-path = "pub.rs"
+name = "discoverer"
+path = "discovere.rs"
